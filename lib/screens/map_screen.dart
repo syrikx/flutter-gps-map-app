@@ -1,6 +1,6 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
-import 'package:google_maps_flutter/google_maps_flutter.dart';
+import 'package:flutter_naver_map/flutter_naver_map.dart';
 import 'package:geolocator/geolocator.dart';
 import '../services/location_service.dart';
 
@@ -12,13 +12,13 @@ class MapScreen extends StatefulWidget {
 }
 
 class _MapScreenState extends State<MapScreen> {
-  final Completer<GoogleMapController> _controller = Completer();
+  final Completer<NaverMapController> _controller = Completer();
   Position? _currentPosition;
-  Set<Marker> _markers = {};
+  Set<NMarker> _markers = {};
   StreamSubscription<Position>? _positionStreamSubscription;
   
-  static const CameraPosition _defaultLocation = CameraPosition(
-    target: LatLng(37.5665, 126.9780), // 서울 기본 좌표
+  static const NCameraPosition _defaultLocation = NCameraPosition(
+    target: NLatLng(37.5665, 126.9780), // 서울 기본 좌표
     zoom: 14.4746,
   );
 
@@ -61,27 +61,31 @@ class _MapScreenState extends State<MapScreen> {
     );
   }
 
-  void _updateMarker(Position position) {
-    _markers = {
-      Marker(
-        markerId: const MarkerId('current_location'),
-        position: LatLng(position.latitude, position.longitude),
-        infoWindow: InfoWindow(
-          title: '현재 위치',
-          snippet: '위도: ${position.latitude.toStringAsFixed(4)}, 경도: ${position.longitude.toStringAsFixed(4)}',
-        ),
-        icon: BitmapDescriptor.defaultMarkerWithHue(BitmapDescriptor.hueBlue),
+  void _updateMarker(Position position) async {
+    final marker = NMarker(
+      id: 'current_location',
+      position: NLatLng(position.latitude, position.longitude),
+      caption: NOverlayCaption(
+        text: '현재 위치\n위도: ${position.latitude.toStringAsFixed(4)}, 경도: ${position.longitude.toStringAsFixed(4)}',
       ),
-    };
+    );
+    
+    if (_controller.isCompleted) {
+      final controller = await _controller.future;
+      await controller.clearOverlays();
+      await controller.addOverlay(marker);
+    }
+    
+    _markers = {marker};
   }
 
   Future<void> _moveCamera(Position position) async {
-    final GoogleMapController controller = await _controller.future;
-    final CameraPosition newCameraPosition = CameraPosition(
-      target: LatLng(position.latitude, position.longitude),
+    final NaverMapController controller = await _controller.future;
+    final NCameraUpdate cameraUpdate = NCameraUpdate.withParams(
+      target: NLatLng(position.latitude, position.longitude),
       zoom: 16.0,
     );
-    controller.animateCamera(CameraUpdate.newCameraPosition(newCameraPosition));
+    controller.updateCamera(cameraUpdate);
   }
 
   @override
@@ -116,15 +120,19 @@ class _MapScreenState extends State<MapScreen> {
                 : const Text('위치 정보를 가져오는 중...'),
           ),
           Expanded(
-            child: GoogleMap(
-              mapType: MapType.normal,
-              initialCameraPosition: _defaultLocation,
-              onMapCreated: (GoogleMapController controller) {
+            child: NaverMap(
+              options: const NaverMapViewOptions(
+                indoorEnable: true,
+                locationButtonEnable: true,
+                consumeSymbolTapEvents: false,
+                initialCameraPosition: _defaultLocation,
+              ),
+              onMapReady: (NaverMapController controller) {
                 _controller.complete(controller);
+                if (_markers.isNotEmpty) {
+                  controller.addOverlayAll(_markers);
+                }
               },
-              markers: _markers,
-              myLocationEnabled: true,
-              myLocationButtonEnabled: true,
             ),
           ),
         ],
