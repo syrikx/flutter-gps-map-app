@@ -35,7 +35,7 @@
             android:value="2" />
         <meta-data 
             android:name="com.naver.maps.map.NCP_KEY_ID" 
-            android:value="bEJdixRftkg5IlzJ0UybQtbcogXzhcPixawF21gT" />
+            android:value="iaqmtca7si" />
     </application>
     <!-- Required to query activities that can process text, see:
          https://developer.android.com/training/package-visibility and
