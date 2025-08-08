@@ -34,7 +34,7 @@
             android:name="flutterEmbedding"
             android:value="2" />
         <meta-data 
-            android:name="com.naver.maps.map.CLIENT_ID" 
+            android:name="com.naver.maps.map.NCP_KEY_ID" 
             android:value="bEJdixRftkg5IlzJ0UybQtbcogXzhcPixawF21gT" />
     </application>
     <!-- Required to query activities that can process text, see:
