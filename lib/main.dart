@@ -4,7 +4,7 @@ import 'screens/map_screen.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  await NaverMapSdk.instance.initialize(clientId: '');
+  await NaverMapSdk.instance.initialize(clientId: 'bEJdixRftkg5IlzJ0UybQtbcogXzhcPixawF21gT');
   runApp(const MyApp());
 }
 
