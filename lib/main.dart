@@ -4,7 +4,14 @@ import 'screens/map_screen.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  await NaverMapSdk.instance.initialize(clientId: 'bEJdixRftkg5IlzJ0UybQtbcogXzhcPixawF21gT');
+  
+  await NaverMapSdk.instance.initialize(
+    clientId: 'bEJdixRftkg5IlzJ0UybQtbcogXzhcPixawF21gT',
+    onAuthFailed: (error) {
+      print('네이버 지도 인증 실패: $error');
+    },
+  );
+  
   runApp(const MyApp());
 }
 
